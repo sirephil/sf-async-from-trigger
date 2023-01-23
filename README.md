@@ -8,7 +8,7 @@ The key parts are:
 
 * The Example__c custom object for which processing is required. Changes to the Account__c or the Datetime__c field values initiate the processing which (for demo purposes) is simply the need to update the Description__c field.
 * The ExampleProcessor that encapsulates the processing to be applied.
-* The TriggeredEvent__e platform event that is used to initiate the required processing. This includes a Type__c field that simply selects the processor to be run - additional implementations of the EventProcessor could easily be created if other types of processing was needed against the Example__c object, or even other object(s), in different situations.
+* The TriggeredEvent__e platform event that is used to initiate the required processing. This includes a Type__c field that simply selects the processor to be run - additional implementations of the EventProcessor could easily be created if other types of processing was needed against the Example__c object, or even other object(s), in different situations. A key takeaway here is that the event processing is single threaded, meaning there is no worry that the Example__c processing might face race conditions (a problem with Queueable and Batchable implementations where two or more can run concurrently and interfere with each other).
 
 The Example__c object's trigger detects the scenario where the processing is required and marks the record(s) that need to be processed. It ensures that at most Platform Event is published for the ExampleProcessor in a given transaction when record(s) get marked for processing. This event will be processed in a subsequent transaction.
 
