@@ -14,6 +14,6 @@ The Example__c object's trigger detects the scenario where the processing is req
 
 The TriggeredEvent__e event's trigger determines the type(s) of processing that are required and ensures that the first of these types gets executed. If that type cannot be fully executed in the trigger an appropriate event gets published to allow the trigger to be called again, for that type, in a subsequent transaction.
 
-Field history tracking has been enabled against 
+Field history tracking has been enabled against Example__c's Account__c, Datetime__c and Description__c fields.
 
 After deployment, assign the Example permission set to your user then access the Examples tab to start playing. You might also like to bulk create Examples to allow use of bulk updates in the Examples "All" list view to see how the processing behaves. Note how the processing is attributed to the Automated Process user.
