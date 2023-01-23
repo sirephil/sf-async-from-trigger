@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Description__c</fullName>
+    <description>The example&apos;s description.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The example&apos;s description.</inlineHelpText>
+    <label>Description</label>
+    <length>255</length>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+</CustomField>

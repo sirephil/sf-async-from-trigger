@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>StateProcessingLastPerformed__c</fullName>
+    <description>This should be set to &quot;now&quot; when State processing is performed.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>This should be set to &quot;now&quot; when State processing is performed.</inlineHelpText>
+    <label>State Processing Last Performed</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>
