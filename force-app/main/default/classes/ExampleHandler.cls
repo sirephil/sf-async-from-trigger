@@ -40,6 +40,11 @@ public without sharing class ExampleHandler {
         // passed to this method.
         Boolean stateProcessingRequired = false;
 
+        if (newExamples == null) {
+            // This must be a deletion DML. This is currently ignored.
+            return;
+        }
+
         for (Integer i = 0; i < newExamples.size(); i++) {
             Example__c original = oldExamples != null ? oldExamples[i] : null;
             Example__c updated = newExamples != null ? newExamples[i] : null;
