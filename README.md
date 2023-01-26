@@ -1,6 +1,14 @@
 # sf-async-from-trigger
 
-Demonstrates how to scalably initiate out-of-transaction processing from an apex trigger using Platform Events.
+Demonstrates how to scalably initiate out-of-transaction processing from an apex trigger using Platform Events
+
+## Why?
+
+* Avoid restricting DML to synchronous-only contexts.
+* Allow callouts or limit-consuming processing on record changes.
+* Ensure records are processed in a single-threaded manner (avoid race conditions and reduce record locking issues).
+
+## What?
 
 An apex trigger processes record creation, update, delete, undelete operations (or a subset thereof) for a given object. These are great for reacting to these changes to validate the records, apply further updates to these records, to (directly or indirectly) related records or to perform other operations. They have specific limitations because they execute synchronously, as part of a DML operation. A major limitation is the inability to perform a callout from within a trigger; callouts are used to initiate communication with (typically) external systems and are a common integration mechanism with off-platform software or systems.
 
@@ -8,7 +16,9 @@ Salesforce generally recommends performing callouts in a future method called fr
 
 The above issue, and a whole bunch of other use cases are addressed by changing the approach and using Platform Events. Other important use cases are where you need to perform some specific processing, perhaps that is too costly in terms of CPU or other limits to include in the trigger, when a record is updated to meet certain criteria and where this processing must only be applied at most once for any given record change.
 
-This repo contains code that addresses the callout and/or governor limit related use cases in an elegant way.
+## How
+
+This repo contains code that addresses the callout and/or governor limit related use cases in an elegant and robust manner.
 
 This demonstration does not include any unit tests, but shows how you can use timestamp fields and a platform event to safely and robustly process records in a separate transaction to the one that detected a need for the processing.
 
@@ -27,3 +37,7 @@ Field history tracking has been enabled against `Example__c`'s `Account__c`, `Da
 # Setup and Running the Demo
 
 After deployment, assign the `Example` permission set to your user then access the `Examples` tab to start playing. You might also like to bulk create `Example` records to allow use of bulk updates in the `Examples` "All" list view to see how the processing behaves. Note how the processing encapsulated in the `ExampleProcessor` is attributed to the Automated Process user, while your changes are attributed to your user.
+
+# Who caused the changes?
+
+The records updated by the processor are marked as Last Modified By the Automated Process user too. This can be a good thing - you can see they have been processed by automation. If this is a significant problem, it is actually possible to engineer a flow-based Platform Event subscriber to replace this apex version. In this case the changes actually get attributed to the contextual user that caused the Platform Event to be published.
