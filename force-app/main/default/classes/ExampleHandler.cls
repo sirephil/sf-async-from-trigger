@@ -41,7 +41,11 @@ public without sharing class ExampleHandler {
         Boolean stateProcessingRequired = false;
 
         if (newExamples == null) {
-            // This must be a deletion DML. This is currently ignored.
+            // This must be a deletion DML. This is currently ignored. This would need to be handled
+            // by creating a record that represents the deletion, capturing the deleted record's ID
+            // (and any other state data required for the later processing). These deletion placeholders
+            // could then be used with a different Event Processor to ensure that deletions are
+            // addressed appropriately.
             return;
         }
 
