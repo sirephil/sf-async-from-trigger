@@ -22,17 +22,29 @@ This repo contains code that addresses the callout and/or governor limit related
 
 This demonstration does not include any unit tests, but shows how you can use timestamp fields and a platform event to safely and robustly process records in a separate transaction to the one that detected a need for the processing.
 
-The key parts are:
+The key parts of this solution are:
 
-* The `Example__c` custom object for which processing is required. Changes to the `Account__c` or the `Datetime__c` field values initiate the processing which (for demo purposes) is simply the need to update the `Description__c` field. This field is suffixed by the ID of the Platform Event that represents the processing execution.
-* The `ExampleProcessor` that encapsulates the processing to be applied. This is an `EventProcessor` implementation.
-* The `TriggeredEvent__e` platform event that is used to initiate the required processing. This includes a `Type__c` field that simply selects the processor to be run - additional implementations of the `EventProcessor` could easily be created if other types of processing was needed against the `Example__c` object, or even other object(s), in different situations. A key takeaway here is that the event processing is single threaded, meaning there is no worry that the `Example__c` processing might face race conditions (a problem with `Queueable` and `Batchable` implementations where two or more instances of the same code can run concurrently and interfere with each other).
+| Component | Description |
+| - | - |
+| Example__c | The custom object for which processing is required in this demo. Contains data fields plus the processing control fields. |
+| Example.trigger<br/>ExampleHandler | The DML trigger and trigger handler for `Example__c`. |
+| EventProcessor | The interface that represents processors for *types* of event. |
+| ExampleProcessor | The `EventProcessor` implementation for handling `Example__c` records that need it. This does the "callout and/or governor limit consuming processing", as required. Here it simply does some simple data manipulation. |
+| TriggeredEvent__e | The platform event published when an `Example__c` needs processing. Could be used for other objects too. Holds the *type* name for the processor that should be instantiated and run. |
+| TriggeredEvent.trigger<br/>TriggeredEventHandler | The trigger-based Platform Event subscriber and handler for `TriggeredEvent__e`. Ensures that events for unique *types* of processor are consumed, executing a single `EventProcessor` for the first type and re-publishing unconsumed *types*. If the current *type* needs further processing, an additional event is published for this *type* in order to ensure it gets chained (after any unconsumed types). |
 
-The `Example__c` object's trigger detects the scenario where the processing is required and marks the record(s) that need to be processed. It ensures that at most one Platform Event is published for the `ExampleProcessor` in a given transaction when record(s) get marked for processing. This event will be processed in a subsequent transaction.
+Note:
 
-The `TriggeredEvent__e` event's trigger determines the type(s) of processing that are required and ensures that the first of these types gets executed. If that type cannot be fully executed in the trigger an appropriate event gets published to allow the trigger to be called again, for that type, in a subsequent transaction.
+* Changes to the `Account__c` or the `Datetime__c` field values in `Example__c` records initiate the processing which (for demo purposes) is simply the need to update the `Description__c` field. This field is suffixed by the ID of the Platform Event that represents the processing execution so you can see which records get processed together. This is most interesting when you limit the `ExampleProcessor` to only process a few records together.
+* The `TriggeredEvent__e` platform event `Type__c` field selects the processor to be run by being the *type* name for the `EventProcessor` to be instantiated.
+* Additional implementations of the `EventProcessor` could easily be created if other *types* of processing was needed against the `Example__c` object, or even other object(s), in different situations.
+* The Platform Event processing is single threaded, meaning there is no worry that the `Example__c` processing might face race conditions (a problem with `Queueable` and `Batchable` implementations where two or more instances of the same code can run concurrently and interfere with each other).
 
-Field history tracking has been enabled against `Example__c`'s `Account__c`, `Datetime__c` and `Description__c` fields so you can see who is doing what changes.
+In terms of the general processing flow:
+
+* The `Example__c` object's trigger detects the scenario where the processing is required and marks the record(s) that need to be processed. It ensures that at most one Platform Event is published for the `ExampleProcessor` in a given transaction when record(s) get marked for processing. This published event will be processed in a subsequent transaction.
+* The `TriggeredEvent__e` event's trigger determines the *type(s)* of processing that are required and ensures that the first of these *types* gets executed. If that *type* cannot be fully executed in the trigger an appropriate event gets published to allow the trigger to be called again, for that *type*, in a subsequent transaction.
+* Field history tracking has been enabled against `Example__c`'s `Account__c`, `Datetime__c` and `Description__c` fields so you can see "who" is doing what changes.
 
 # Setup and Running the Demo
 
