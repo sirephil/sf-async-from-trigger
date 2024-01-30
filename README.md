@@ -46,6 +46,10 @@ In terms of the general processing flow:
 * The `TriggeredEvent__e` event's trigger determines the *type(s)* of processing that are required and ensures that the first of these *types* gets executed. If that *type* cannot be fully executed in the trigger an appropriate event gets published to allow the trigger to be called again, for that *type*, in a subsequent transaction.
 * Field history tracking has been enabled against `Example__c`'s `Account__c`, `Datetime__c` and `Description__c` fields so you can see "who" is doing what changes.
 
+### Alternative patterns
+
+Take a look at [sf-async-callout](https://github.com/sirephil/sf-async-callout) which takes the approach of creating a separate "command" object instead of updating the originating record. This alternative also covers how to actually perform the callout itself (by getting into a context where callouts are permitted; they cannot yet be done directly from a Platform Event apex trigger subscriber).
+
 # Setup and Running the Demo
 
 After deployment, assign the `Example` permission set to your user then access the `Examples` tab to start playing. You might also like to bulk create `Example` records to allow use of bulk updates in the `Examples` "All" list view to see how the processing behaves. Note how the processing encapsulated in the `ExampleProcessor` is attributed to the Automated Process user, while your changes are attributed to your user.
